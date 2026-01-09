@@ -91,17 +91,19 @@ export default function DashboardPage() {
         }
     };
 
-    const handleAttendanceChangeFromTimetable = (subjectName: string, action: 'attend' | 'miss') => {
-        setSubjects(prevSubjects =>
-          prevSubjects.map(subject => {
-            if (subject.name === subjectName) {
-              const newAttended = action === 'attend' ? subject.attended + 1 : subject.attended;
-              const newTotal = subject.total + 1;
-              return { ...subject, attended: newAttended, total: newTotal };
-            }
-            return subject;
-          })
-        );
+    const handleAttendanceChangeFromTimetable = (subjectName: string, action: 'attend' | 'miss' | 'cancel') => {
+        if (action !== 'cancel') {
+            setSubjects(prevSubjects =>
+              prevSubjects.map(subject => {
+                if (subject.name === subjectName) {
+                  const newAttended = action === 'attend' ? subject.attended + 1 : subject.attended;
+                  const newTotal = subject.total + 1;
+                  return { ...subject, attended: newAttended, total: newTotal };
+                }
+                return subject;
+              })
+            );
+        }
     
         setWeeklyTimetable(prev => {
             const newWeeklyTimetable = { ...prev };
@@ -109,6 +111,9 @@ export default function DashboardPage() {
     
             const newDaySchedule = daySchedule.map(entry => {
                 if (entry.subject === subjectName) {
+                    if (action === 'cancel') {
+                         return { ...entry, status: 'cancelled' };
+                    }
                     return { ...entry, status: action === 'attend' ? 'attended' : 'missed' };
                 }
                 return entry;
